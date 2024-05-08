@@ -35,7 +35,7 @@ The Eco Coach Visualizer is a simple data visualisation tool using NodeJS, googl
 
 ## Data Format
 
-The tool expects your Eco Coach Json driving data in any number of .json files located in a folder called 'data' in the root of the application. This data can be obtained by intercepting the api calls between the app and server. You can achieve this, for example, by installing the app in the Android Emulator and intercepting traffic using `https://httptoolkit.com/`.
+The tool expects your Eco Coach Json driving data in any number of .json files located in a folder called 'data' in the root of the application. This data can be obtained by intercepting the api calls between the app and server. You can achieve this, for example, by installing the app in the Android Emulator and intercepting traffic using `https://httptoolkit.com/`. The Api endpoint looks like this: api/v5/VINXXXXXXXXXXXXXXXXX/report.
 This is the structure of the JSON the app expects:
 ```json
 {
