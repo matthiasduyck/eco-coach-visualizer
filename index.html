@@ -27,7 +27,8 @@
 </head>
 <body>
 <h1>SOH tool</h1>
-    <div id="chart_div"></div>
+    <div id="soh_chart_div"></div>
+    <div id="consumption_chart_div"></div>
     <script>
         $(document).ready(function() {
 		console.log("Start getting data");
@@ -37,54 +38,87 @@
 			console.log(jsonData);
                 // Use data to generate Google Charts visualization
                 google.charts.load('current', {'packages':['corechart']});
-				google.charts.setOnLoadCallback(drawChart);
+				google.charts.setOnLoadCallback(drawCharts);
 
-                function drawChart() {
-
-					var data_table = new google.visualization.DataTable();
-					data_table.addColumn('date', 'Date');
-					data_table.addColumn('number', 'SoH');
-
-					var date_formatter = new google.visualization.DateFormat({ 
-					    pattern: "MMM, dd, yyyy - HH : MM"
-					}); 
-					date_formatter.format(data_table, 0);  // Where 0 is the index of the column
-
-					// Convert date strings to JavaScript Date objects
+                function drawCharts() {
+                	// Convert date strings to JavaScript Date objects
 					jsonData.forEach(function(entry) {
 						entry.date = new Date(entry.date);
 					});
 
-					data_table.addRows(
-						jsonData
-							.filter(entry => entry.soh >= 0)//we can have negative soh when driving downhill and regenerative braking
-							.filter(entry => entry.distanceTraveled>3)//also filter out any short distances
-							.map(entry => [entry.date, entry.soh]));
+					function drawSOHchart() {
+						var soh_data_table = new google.visualization.DataTable();
+						soh_data_table.addColumn('date', 'Date');
+						soh_data_table.addColumn('number', 'SoH');
 
-					var options = {
-						title: 'Battery State of Health Over Time',
-						curveType: 'function',
-						legend: { position: 'bottom' },
-						hAxis: {
-							//format: 'yyyy-MM-dd_HH:mm' // Date format for horizontal axis labels
-							
-						},
-						vAxis: {
-							viewWindow: {
-					            min: 0, // Minimum value on the x-axis
-					            max: 150 // Maximum value on the x-axis
-					        }
-						},
-					    tooltip: {
-					        isHtml: true,
-					        trigger: 'both' // Display tooltip on both hover and selection
-					    }
-					};
-					//console.log(data)
+						
 
-					var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+						soh_data_table.addRows(
+							jsonData
+								.filter(entry => entry.soh >= 0)//we can have negative soh when driving downhill and regenerative braking
+								.filter(entry => entry.distanceTraveled>3)//also filter out any short distances
+								.map(entry => [entry.date, entry.soh]));
 
-					chart.draw(data_table, options);
+						var options = {
+							title: 'Battery State of Health Over Time',
+							curveType: 'function',
+							legend: { position: 'bottom' },
+							hAxis: {
+								//format: 'yyyy-MM-dd_HH:mm' // Date format for horizontal axis labels
+								
+							},
+							vAxis: {
+								viewWindow: {
+						            min: 0, // Minimum value on the x-axis
+						            max: 150 // Maximum value on the x-axis
+						        }
+							}
+						};
+
+
+						var chart = new google.visualization.LineChart(document.getElementById('soh_chart_div'));
+
+						chart.draw(soh_data_table, options);
+					}
+					drawSOHchart();
+
+					function drawEfficiencyChart() {
+						var efficiency_data_table = new google.visualization.DataTable();
+						efficiency_data_table.addColumn('date', 'Date');
+						efficiency_data_table.addColumn('number', 'Electric Consumption');
+
+						
+
+						efficiency_data_table.addRows(
+							jsonData
+								.filter(entry => entry.soh >= 0)//we can have negative soh when driving downhill and regenerative braking
+								.filter(entry => entry.distanceTraveled>3)//also filter out any short distances
+								.map(entry => [entry.date, entry.electricConsumption]));
+
+						var options = {
+							title: 'Electric Consumption Over Time',
+							curveType: 'function',
+							legend: { position: 'bottom' },
+							hAxis: {
+								//format: 'yyyy-MM-dd_HH:mm' // Date format for horizontal axis labels
+								
+							},
+							vAxis: {
+								viewWindow: {
+						            min: 10, // Minimum value on the x-axis
+						            max: 40 // Maximum value on the x-axis
+						        }
+							}
+						};
+
+
+						var chart = new google.visualization.LineChart(document.getElementById('consumption_chart_div'));
+
+						chart.draw(efficiency_data_table, options);
+					}
+					drawEfficiencyChart();
+
+					
 				}
             });
         });

@@ -70,7 +70,8 @@ function extractElectricDrivingData(jsonData) {
                 const batterySoHEntry = {
                     date: new Date(event.createdAt),
                     soh: soh,
-                    distanceTraveled: event.distanceTraveled.value
+                    distanceTraveled: event.distanceTraveled.value,
+                    electricConsumption: event.electricConsumption.value
                 };
 
                 // Add the entry to the batterySoHList
