@@ -94,6 +94,9 @@ app.get('/getelectricdrivingdata', (req, res) => {
     res.json(electricDrivingData);
 });
 
+// Serve static files from the root directory
+app.use(express.static(__dirname));
+
 // Serve HTML page
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
