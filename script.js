@@ -1,5 +1,5 @@
 $(document).ready(function() {
-console.log("Start getting data");
+	console.log("Start getting data");
     // Fetch battery SoH data from API
     $.get('/getelectricdrivingdata', function(jsonData) {
 	console.log("got data:");
@@ -94,5 +94,12 @@ console.log("Start getting data");
 
 			
 		}
+    });
+
+
+    // Fetch battery SoH data from API
+    $.get('/getstatistics', function(jsonData) {
+		console.log("got data:");
+		console.log(jsonData);	
     });
 });

@@ -40,9 +40,9 @@ function readAllJSONFiles(folderPath) {
     }
 }
 
-// Calculate battery SoH
+// Extract driving data
 function extractElectricDrivingData(jsonData) {
-    const batterySoHList = [];
+    const drivingDataList = [];
 
     // Loop through each JSON file data
     jsonData.forEach(fileData => {
@@ -62,36 +62,80 @@ function extractElectricDrivingData(jsonData) {
                 // Calculate current State of Health based on percentage difference
                 const soh = (estimatedCapacity / consumption) * 100;
 				//console.log("soh"+soh);
-                if(soh<-100){
-                    console.log(event)
-                }
 
                 // Create an object with date and SoH values
-                const batterySoHEntry = {
+                const drivingDataEntry = {
                     date: new Date(event.createdAt),
                     soh: soh,
                     distanceTraveled: event.distanceTraveled.value,
                     electricConsumption: event.electricConsumption.value
                 };
 
-                // Add the entry to the batterySoHList
-                batterySoHList.push(batterySoHEntry);
+                // Add the entry to the drivingDataList
+                drivingDataList.push(drivingDataEntry);
             }
         });
     });
 
-    // Sort the batterySoHList by date
-    batterySoHList.sort((a, b) => a.date - b.date);
+    // Sort the drivingDataList by date
+    drivingDataList.sort((a, b) => a.date - b.date);
 
-    return batterySoHList;
+    return drivingDataList;
 }
 
 
-// API endpoint to get battery SoH data
+// Extract statistics data
+function extractStatisticsData(jsonData) {
+    
+
+    var chargeCount = 0;
+    var sumPercentageCharged = 0;
+    var timeChargedSeconds = 0;    
+
+
+    // Loop through each JSON file data
+    jsonData.forEach(fileData => {
+        // Loop through each event in the file
+        
+
+        fileData.events.forEach(event => {
+            // Get the charging events
+            if (event.type === "CHARGE") {
+                // Total number of charges
+                chargeCount++;
+                // Total time charged
+                timeChargedSeconds = timeChargedSeconds + event.durationInSec;
+
+                sumPercentageCharged = sumPercentageCharged + event.socDiff;
+            }
+
+
+        });
+    });
+
+    const statistics = {
+        totalCharges: chargeCount,
+        totalTimeChargedSeconds: timeChargedSeconds,
+        averageChargedPercentage: sumPercentageCharged/chargeCount
+    }
+
+
+    return statistics;
+}
+
+
+// API endpoint to get driving data
 app.get('/getelectricdrivingdata', (req, res) => {
     const jsonData = readAllJSONFiles(dataFolderPath);
     const electricDrivingData = extractElectricDrivingData(jsonData);
     res.json(electricDrivingData);
+});
+
+// API endpoint to get driving data
+app.get('/getstatistics', (req, res) => {
+    const jsonData = readAllJSONFiles(dataFolderPath);
+    const statistics = extractStatisticsData(jsonData);
+    res.json(statistics);
 });
 
 // Serve static files from the root directory
